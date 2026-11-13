@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Red Chilli — Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-obsidian: #050907;
+      --bg-forest: #071a12;
+      --surface-glass: rgba(13, 35, 26, 0.78);
+      --surface-elevated: rgba(16, 45, 33, 0.88);
+      --emerald: #10b981;
+      --emerald-bright: #34d399;
+      --emerald-dark: #064e3b;
+      --chilli: #ef4444;
+      --chilli-glow: #fb7185;
+      --amber: #f59e0b;
+      --text-main: #ecfdf5;
+      --text-muted: #9ca3af;
+      --border-glass: rgba(16, 185, 129, 0.28);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top right, #0b2e1f 0%, var(--bg-forest) 32%, var(--bg-obsidian) 78%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 94px;
+      overflow-x: hidden;
+    }
+
+    .app-shell {
+      max-width: 540px;
+      margin: 0 auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 4px 2px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-badge {
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--chilli), #b91c1c);
+      border: 1px solid rgba(52, 211, 153, 0.55);
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      box-shadow: 0 8px 22px rgba(239, 68, 68, 0.35);
+    }
+
+    .brand-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: var(--emerald-bright);
+      letter-spacing: 0.9px;
+    }
+
+    .tg-chip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(6, 78, 59, 0.65);
+      border: 1px solid var(--border-glass);
+      color: var(--emerald-bright);
+      max-width: 175px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .glass-card {
+      background: linear-gradient(135deg, var(--surface-glass), var(--surface-elevated));
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glass);
+      border-radius: 20px;
+      padding: 18px;
+      box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .hero-card {
+      background:
+        radial-gradient(circle at 88% 12%, rgba(239, 68, 68, 0.2), transparent 45%),
+        radial-gradient(circle at 14% 88%, rgba(16, 185, 129, 0.25), transparent 55%),
+        linear-gradient(145deg, rgba(10, 34, 24, 0.94), rgba(5, 9, 7, 0.96));
+    }
+
+    .profile-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1.5px solid var(--emerald-bright);
+      display: grid;
+      place-items: center;
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--emerald-bright);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--emerald-bright);
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      margin-bottom: 5px;
+    }
+
+    .balance-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .btn-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      height: 48px;
+      padding: 0 16px;
+      border-radius: 14px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    .btn-emerald {
+      background: linear-gradient(135deg, var(--emerald-bright), var(--emerald));
+      color: var(--bg-obsidian);
+    }
+
+    .btn-chilli {
+      background: linear-gradient(135deg, var(--chilli), #dc2626);
+      color: #ffffff;
+    }
+
+    .btn-outline {
+      background: rgba(5, 9, 7, 0.55);
+      color: var(--emerald-bright);
+      border: 1px solid var(--border-glass);
+    }
+
+    .btn-full { width: 100%; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .stat-box {
+      background: var(--surface-glass);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 2px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .ref-box {
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(5, 9, 7, 0.72);
+      border: 1px solid var(--border-glass);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--emerald-bright);
+      word-break: break-all;
+    }
+
+    .pill-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .pill {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 11px;
+      border-radius: 999px;
+      background: rgba(6, 78, 59, 0.55);
+      border: 1px solid var(--border-glass);
+      color: var(--text-main);
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .list-item:last-child { border-bottom: none; padding-bottom: 0; }
+
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid var(--border-glass);
+      color: var(--emerald-bright);
+    }
+
+    .section {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      animation: fadeIn 0.22s ease;
+    }
+
+    .section.active { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 540px;
+      background: rgba(7, 26, 18, 0.94);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid var(--border-glass);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 8px 8px calc(8px + env(safe-area-inset-bottom));
+      z-index: 50;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 4px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+
+    .nav-btn.active {
+      color: var(--emerald-bright);
+      background: rgba(16, 185, 129, 0.14);
+    }
+
+    .toast {
+      position: fixed;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--surface-elevated);
+      border: 1px solid var(--emerald);
+      color: var(--text-main);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      display: none;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <div class="app-shell">
+    <!-- Top Brand Header -->
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true">🌶️</div>
+        <div>
+          <div class="brand-title">Red Chilli</div>
+          <div class="brand-sub">TASK &amp; REWARD PLATFORM</div>
+        </div>
+      </div>
+      <div id="tgUserBadge" class="tg-chip">Telegram Guest</div>
+    </header>
+
+    <!-- HOME SECTION -->
+    <section id="tab-home" class="section active">
+      <div class="glass-card hero-card">
+        <div class="profile-row">
+          <div id="avatarBox" class="avatar">RC</div>
+          <div>
+            <div id="userDisplayName" style="font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700;">Red Chilli Member</div>
+            <div id="userHandle" class="muted" style="font-size: 12px;">Telegram ID: Not linked yet</div>
+          </div>
+        </div>
+
+        <div class="eyebrow">Available Balance</div>
+        <div id="balanceDisplay" class="balance-value">৳0</div>
+        <p id="tgProfileLine" class="muted">New accounts start at ৳0. Balances update strictly from verified Firestore rewards and deposits.</p>
+        <div class="btn-row">
+          <button class="btn btn-emerald" onclick="switchTab('tasks')">Start Tasks</button>
+          <button class="btn btn-outline" onclick="switchTab('wallet')">Open Wallet</button>
+        </div>
+      </div>
+
+      <!-- Metrics -->
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-val" id="statTasks">0</div>
+          <div class="stat-label">Completed Tasks</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val" id="statRefs">0</div>
+          <div class="stat-label">Total Referrals</div>
+        </div>
+      </div>
+
+      <!-- Personal Referral Link -->
+      <div class="glass-card">
+        <div class="eyebrow">Personal Referral Link</div>
+        <div id="refLinkBox" class="ref-box">redchilli://start?ref=CONNECT_ACCOUNT</div>
+        <div class="btn-row">
+          <button class="btn btn-outline" onclick="copyRefLink()">Copy Referral Link</button>
+          <button class="btn btn-emerald" onclick="shareRefLink()">Share Now</button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="glass-card">
+        <div class="eyebrow">Recent Activity</div>
+        <p class="muted">No verified activity yet. Complete tasks, invite friends, or submit a wallet request in the connected Red Chilli platform to see live history here.</p>
+      </div>
+    </section>
+
+    <!-- EARN SECTION -->
+    <section id="tab-earn" class="section">
+      <div class="glass-card">
+        <div class="eyebrow">Referral &amp; Ad Rewards</div>
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; margin-bottom: 6px;">Invite Friends &amp; Watch Ads</h2>
+        <p class="muted">Every referral is protected against duplicates and self-referrals, and bonus payouts are audited via Firestore transactions.</p>
+        <div class="pill-row">
+          <span class="pill">Unique Referral Code</span>
+          <span class="pill">Anti-Fraud Rules</span>
+          <span class="pill">Countdown Ad Verification</span>
+        </div>
+        <div style="margin-top: 14px;">
+          <button class="btn btn-emerald btn-full" onclick="openMiniAppSync()">Sync Account in Red Chilli</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASKS SECTION -->
+    <section id="tab-tasks" class="section">
+      <div class="glass-card">
+        <div class="eyebrow">Task Categories</div>
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; margin-bottom: 8px;">Verified Task System</h2>
+        <div class="list-item">
+          <div>
+            <div style="font-weight: 700;">YouTube Subscribe Tasks</div>
+            <div class="muted">Subscribe &amp; submit channel proof</div>
+          </div>
+          <span class="badge">VERIFIED</span>
+        </div>
+        <div class="list-item">
+          <div>
+            <div style="font-weight: 700;">Facebook Follow Tasks</div>
+            <div class="muted">Follow official partner pages</div>
+          </div>
+          <span class="badge">VERIFIED</span>
+        </div>
+        <div class="list-item">
+          <div>
+            <div style="font-weight: 700;">Telegram Channel Join</div>
+            <div class="muted">Join channels &amp; verify @username</div>
+          </div>
+          <span class="badge">VERIFIED</span>
+        </div>
+        <div class="list-item">
+          <div>
+            <div style="font-weight: 700;">Watch Advertisement</div>
+            <div class="muted">Timed countdown verification</div>
+          </div>
+          <span class="badge">VERIFIED</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- WALLET SECTION -->
+    <section id="tab-wallet" class="section">
+      <div class="glass-card">
+        <div class="eyebrow">Manual Payment Methods</div>
+        <h2 style="font-family: 'Space Grotesk', sans-serif; font-size: 19px; margin-bottom: 6px;">bKash • Nagad • Rocket</h2>
+        <p class="muted">All deposits and withdrawals require Transaction ID verification and admin approval. Statuses: Pending, Approved, Rejected.</p>
+        <div class="stats-grid" style="margin-top: 12px;">
+          <div class="stat-box">
+            <div class="stat-val">৳0</div>
+            <div class="stat-label">Total Earned</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val">৳0</div>
+            <div class="stat-label">Total Withdrawn</div>
+          </div>
+        </div>
+        <div style="margin-top: 14px;">
+          <button class="btn btn-chilli btn-full" onclick="openMiniAppSync()">Open Wallet Ledger</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Bottom 4-Tab Navigation -->
+  <nav class="bottom-nav" aria-label="Primary Navigation">
+    <button class="nav-btn active" data-tab="home" onclick="switchTab('home')">
+      <span>🏠</span><span>Home</span>
+    </button>
+    <button class="nav-btn" data-tab="earn" onclick="switchTab('earn')">
+      <span>🎁</span><span>Earn</span>
+    </button>
+    <button class="nav-btn" data-tab="tasks" onclick="switchTab('tasks')">
+      <span>✅</span><span>Tasks</span>
+    </button>
+    <button class="nav-btn" data-tab="wallet" onclick="switchTab('wallet')">
+      <span>💳</span><span>Wallet</span>
+    </button>
+  </nav>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    let detectedUser = { id: "", username: "", firstName: "Red Chilli Member", photoUrl: "", ref: "" };
+
+    (function initTelegramMiniApp() {
+      const params = new URLSearchParams(window.location.search);
+      const refFromUrl = params.get("ref") || params.get("tgWebAppStartParam") || "";
+
+      if (tg) {
+        tg.ready();
+        tg.expand();
+        if (tg.setHeaderColor) tg.setHeaderColor("#071a12");
+        if (tg.setBackgroundColor) tg.setBackgroundColor("#050907");
+        const u = tg.initDataUnsafe && tg.initDataUnsafe.user;
+        if (u) {
+          detectedUser.id = String(u.id || "");
+          detectedUser.username = u.username || "";
+          detectedUser.firstName = [u.first_name, u.last_name].filter(Boolean).join(" ") || "Telegram User";
+          detectedUser.photoUrl = u.photo_url || "";
+        }
+        detectedUser.ref = (tg.initDataUnsafe && tg.initDataUnsafe.start_param) || refFromUrl;
+      } else {
+        detectedUser.ref = refFromUrl;
+      }
+
+      const badge = document.getElementById("tgUserBadge");
+      const nameEl = document.getElementById("userDisplayName");
+      const handleEl = document.getElementById("userHandle");
+      const avatarBox = document.getElementById("avatarBox");
+      const refBox = document.getElementById("refLinkBox");
+
+      nameEl.textContent = detectedUser.firstName;
+      if (detectedUser.id) {
+        badge.textContent = detectedUser.username ? `@${detectedUser.username}` : `ID ${detectedUser.id}`;
+        handleEl.textContent = detectedUser.username
+          ? `@${detectedUser.username} • TG ID: ${detectedUser.id}`
+          : `TG ID: ${detectedUser.id}`;
+      }
+      if (detectedUser.photoUrl) {
+        avatarBox.innerHTML = `<img src="${detectedUser.photoUrl}" alt="${detectedUser.firstName}" />`;
+      } else {
+        avatarBox.textContent = detectedUser.firstName.slice(0, 2).toUpperCase();
+      }
+      if (detectedUser.ref) {
+        refBox.textContent = `redchilli://start?ref=${encodeURIComponent(detectedUser.ref)}`;
+      }
+    })();
+
+    function switchTab(tab) {
+      document.querySelectorAll(".section").forEach((el) => el.classList.remove("active"));
+      document.querySelectorAll(".nav-btn").forEach((el) => el.classList.remove("active"));
+      document.getElementById(`tab-${tab}`).classList.add("active");
+      document.querySelector(`.nav-btn[data-tab="${tab}"]`).classList.add("active");
+    }
+
+    function openMiniAppSync() {
+      const q = new URLSearchParams();
+      if (detectedUser.ref) q.set("ref", detectedUser.ref);
+      if (detectedUser.id) q.set("tg_id", detectedUser.id);
+      if (detectedUser.username) q.set("tg_user", detectedUser.username);
+      const qs = q.toString();
+      window.location.href = qs ? `redchilli://start?${qs}` : "redchilli://start";
+    }
+
+    function copyRefLink() {
+      const link = document.getElementById("refLinkBox").textContent;
+      navigator.clipboard.writeText(link).then(() => showToast("Referral link copied!"));
+    }
+
+    function shareRefLink() {
+      const link = document.getElementById("refLinkBox").textContent;
+      if (navigator.share) {
+        navigator.share({ title: "Red Chilli", text: "Join Red Chilli Task & Reward Platform", url: link });
+      } else {
+        copyRefLink();
+      }
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.style.display = "block";
+      setTimeout(() => { el.style.display = "none"; }, 2600);
+    }
+  </script>
+</body>
+</html>
